@@ -13,25 +13,25 @@ const ExtractJWT = jwt.ExtractJwt
 const InitializePassport = () => {
 
   const cookieExtractor = req => {
-    const token = req.cookies.jwtCookie ? req.cookies.jwtCookie : null
-
+    const token = req.headers.authorization ? req.headers.authorization : null
+    
     console.log("cookieExtractor", token)
 
     return token
   }
 
   passport.use('jwt', new JWTStrategy({
-    jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]), //El token va a venir desde cookieExtractor
+    jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET
   }, async (jwt_payload, done) => { //jwt_payload = info del token (en este caso, datos del cliente)
     try {
         return done(null, jwt_payload)
     } catch (error) {
-        return done(error)
+        return done( error)
     }
   }))
 
-  passport.use("register",new LocalStrategy({usernameField: "email",passReqToCallback: true},
+  passport.use("signup",new LocalStrategy({usernameField: "email",passReqToCallback: true},
       async (req,username, password, done) => {
         const { first_name, last_name, email, age } = req.body;
         try {

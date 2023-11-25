@@ -9,7 +9,7 @@ form.addEventListener('submit', async (e) => {
     console.log(prod)
 
     try {
-        const response = await fetch('/api/users', {
+        const response = await fetch('/api/users/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ form.addEventListener('submit', async (e) => {
         });
 
         const data = await response.json();
-
+        console.log(data);
 
         if (response.ok) {
             try {

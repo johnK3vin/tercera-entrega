@@ -1,5 +1,5 @@
 import {userModel} from '../dao/models/users.models.js'
-
+import { createHash, validatePassword } from '../utils/bcrypt.js';
 export const getUsers = async (req, res) => {
     const {limit, page} = req.query;
     let query = {};  
@@ -37,9 +37,11 @@ export const getUser = async (req, res) => {
 
 export const createUser = async (req, res) => {
     const {name, lastName, email, password, role} = req.body;
+    console.log("todo bien aqui")
 
     try {
-        const user = await userModel.create({name, lastName, email, password, role});
+        const cryPassword = await createHash(password);
+        const user = await userModel.create({name, lastName, email, password:cryPassword, role});
 
         if(user) {
             return res.status(201).send(user)
@@ -85,6 +87,7 @@ export const deleteUser = async (req, res) => {
 }
 
 const userSignup = async (req, res) => {
+    console.log("todo bien aqui")
     try {
         if(!req.user){
             res.status(401).send({ resultado: 'Usuario invalido' });

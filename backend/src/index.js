@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express'
 import cookieParser from 'cookie-parser';
 import MongoStore from 'connect-mongo';
+import cors from 'cors';
 import { Server } from "socket.io";
 import mongoose from "mongoose";
 import session from 'express-session';
@@ -26,11 +27,23 @@ import { userManager } from './dao/models/userManager.js';
 import { messageManager } from './dao/models/messagesManager.js';
 
 dotenv.config();
+
 const viewsRouter = viewRouter;
 const apisRouter = apiRouter;
 const app = express();
 const PORT = 8080;
 
+
+const whitelist = ['http://localhost:5173']
+const corsOptions = {
+  origin: function(origin, callback){
+    if(whitelist.indexOf(origin) != -1 || !origin ){
+      callback(null, true)
+    }else{
+      callback(new Error("Acceso denegado"))
+    }
+  }
+}
 const server = app.listen(PORT, ()=>{
     console.log(`Server on port ${PORT}`);
 })
@@ -42,6 +55,7 @@ mongoose.connect(process.env.MONGO_URL)
 
 //middlaware
 app.use(express.json());
+app.use(cors(corsOptions))
 app.use(cookieParser(process.env.SIGNED_COOKIE))
 app.use(express.urlencoded({extended: true}));
 app.use(session({
@@ -82,14 +96,6 @@ app.use('/logout', express.static(path.join(__dirname, '/public')))
 app.use('/signup', express.static(path.join(__dirname, '/public')))
 app.use('/chat', express.static(path.join(__dirname, '/public')))
 
-
-//generando cookies
-app.get('/setCookie' , (req, res) =>{
-  res.cookie('CookieCookie', "Esto es una Cookie").send('Cookie generada')
-})
-app.get('/getCookie', (req, res) =>{
-  res.send(req.cookies)
-})
 
 const io = new Server(server);
 

@@ -18,30 +18,31 @@ async function handleSuccessfulLogin(req, res, user) {
         secure: process.env.NODE_ENV !== 'development',
         maxAge: 3600000
     });
-
     const userData = JSON.stringify(req.session.passport.user);
+    
     res.cookie('userData', userData, {
         path: '/',
         httpOnly: false,
         secure: process.env.NODE_ENV !== 'development',
         maxAge: 3600000
     });
-
 }
-
 
 const login = async (req, res) => {
     try {
         if(!req.user){
             res.status(401).send({ resultado: 'Usuario invalido' });
         }
+        
         await handleSuccessfulLogin(req, res, req.user);
+        const token = await generateToken(req.user);
         res.status(200).json({
             redirectTo: '/home',
             payload: req.session.passport,
-            firstLogin: true
+            firstLogin: true,
+            token : token
         });
-
+        
 
     } catch (error) {
         console.error('Hubo un error al iniciar sesión:', error);

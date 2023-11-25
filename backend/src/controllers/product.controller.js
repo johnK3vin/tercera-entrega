@@ -39,10 +39,15 @@ export const createProduct = async (req, res) => {
     console.log('req.body', req.body)
 
     try {
+        // const codes = await prodModel.find()
+        // const index = codes.findIndex(code)
+        // if(index == -1){
+        //     res.status(400).send({message: `El codigo ${code} ya existe`})
+        // }
         const product = await prodModel.create({title, description, price, stock, category, code});
 
         if(product) {
-            return res.status(201).send(product)
+            return res.status(201).send("Producto creado " + product)
         }
         res.status(400).send({message: 'No se pudo crear el producto'})
     } catch (error) {
